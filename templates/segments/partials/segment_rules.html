@@ -1,0 +1,293 @@
+{% load djicons i18n %}
+
+<!-- Rules Card -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h3 class="card-title">
+            {% icon "filter-outline" css_class="text-primary" %}
+            {% trans "Rules" %}
+        </h3>
+        <button class="btn btn-ghost btn-sm btn-circle color-primary"
+                @click="addRuleOpen = !addRuleOpen; if(addRuleOpen) resetForm(); addRuleOpen = true"
+                title="{% trans 'Add Rule' %}">
+            {% icon "add-outline" %}
+        </button>
+    </div>
+
+    <div class="card-body p-0">
+        {% if rules %}
+        <div class="list">
+            {% for rule in rules %}
+            <div class="list-item" x-data="{ showActions: false }"
+                 @mouseenter="showActions = true" @mouseleave="showActions = false">
+                <div class="list-item-start">
+                    <span class="badge badge-sm w-6 h-6 flex items-center justify-center">{{ forloop.counter }}</span>
+                </div>
+                <div class="list-item-content">
+                    <div class="list-item-label text-sm">
+                        {{ rule.get_field_display }}
+                    </div>
+                    <div class="list-item-note text-xs">
+                        <span class="font-medium">{{ rule.get_operator_display }}</span>
+                        {% if rule.value %}
+                        <span class="text-primary">"{{ rule.value }}"</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="list-item-end" x-show="showActions" x-cloak>
+                    <div class="flex gap-1">
+                        <button class="btn btn-ghost btn-sm btn-circle"
+                                @click="startEdit({
+                                    id: '{{ rule.id }}',
+                                    field: '{{ rule.field }}',
+                                    operator: '{{ rule.operator }}',
+                                    value: '{{ rule.value|escapejs }}',
+                                    editUrl: '{% url 'segments:rule_edit' segment_id=segment.id rule_id=rule.id %}'
+                                })"
+                                title="{% trans 'Edit' %}">
+                            {% icon "create-outline" %}
+                        </button>
+                        <button class="btn btn-ghost btn-sm btn-circle color-error"
+                                hx-post="{% url 'segments:rule_delete' segment_id=segment.id rule_id=rule.id %}"
+                                hx-target="#segment-detail-area"
+                                hx-swap="outerHTML"
+                                hx-confirm="{% trans 'Delete this rule?' %}"
+                                title="{% trans 'Delete' %}">
+                            {% icon "trash-outline" %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {% if not forloop.last %}
+            <div class="px-4 py-1 text-center">
+                {% if segment.logic_operator == 'and' %}
+                <span class="badge badge-sm">{% trans "AND" %}</span>
+                {% else %}
+                <span class="badge badge-sm color-warning">{% trans "OR" %}</span>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8 text-base-content/40">
+            {% icon "filter-outline" css_class="text-3xl block mx-auto mb-2" %}
+            <p class="text-sm">{% trans "No rules defined" %}</p>
+            <p class="text-xs mt-1">{% trans "Add rules to filter customers into this segment" %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add/Edit Rule Form (Alpine toggle) -->
+<div x-show="addRuleOpen" x-cloak x-transition>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">
+                {% icon "add-circle-outline" css_class="text-primary" %}
+                <span x-text="editingRule ? '{% trans "Edit Rule" %}' : '{% trans "Add Rule" %}'"></span>
+            </h3>
+            <button class="btn btn-ghost btn-sm btn-circle" @click="resetForm()" title="{% trans 'Close' %}">
+                {% icon "close-outline" %}
+            </button>
+        </div>
+        <div class="card-body">
+            <!-- Add Rule Form -->
+            <template x-if="!editingRule">
+                <form hx-post="{% url 'segments:rule_add' segment_id=segment.id %}"
+                      hx-target="#segment-detail-area"
+                      hx-swap="outerHTML"
+                      @htmx:after-request="resetForm()"
+                      class="flex flex-col gap-3">
+                    {% csrf_token %}
+
+                    <!-- Field -->
+                    <div>
+                        <label class="text-sm font-medium mb-1 block">{% trans "Field" %}</label>
+                        <select name="field" class="select w-full" x-model="selectedField" required>
+                            <option value="">{% trans "Select field..." %}</option>
+                            {% for value, label in field_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Operator -->
+                    <div>
+                        <label class="text-sm font-medium mb-1 block">{% trans "Operator" %}</label>
+                        <select name="operator" class="select w-full" x-model="selectedOperator" required>
+                            <option value="">{% trans "Select operator..." %}</option>
+                            {% for value, label in operator_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Value -->
+                    <div x-show="needsValue" x-transition>
+                        <label class="text-sm font-medium mb-1 block">{% trans "Value" %}</label>
+                        <template x-if="currentValueType === 'boolean'">
+                            <select name="value" class="select w-full" x-model="ruleValue">
+                                <option value="true">{% trans "Yes" %}</option>
+                                <option value="false">{% trans "No" %}</option>
+                            </select>
+                        </template>
+                        <template x-if="currentValueType === 'number'">
+                            <input type="number" name="value" class="input w-full"
+                                   placeholder="{% trans 'Enter a number...' %}"
+                                   x-model="ruleValue"
+                                   step="any">
+                        </template>
+                        <template x-if="currentValueType === 'date'">
+                            <input type="number" name="value" class="input w-full"
+                                   placeholder="{% trans 'Number of days...' %}"
+                                   x-model="ruleValue"
+                                   min="0">
+                        </template>
+                        <template x-if="currentValueType === 'string'">
+                            <input type="text" name="value" class="input w-full"
+                                   placeholder="{% trans 'Enter value...' %}"
+                                   x-model="ruleValue">
+                        </template>
+                    </div>
+
+                    <!-- Hidden value type -->
+                    <input type="hidden" name="value_type" :value="currentValueType">
+
+                    <div class="flex justify-end gap-2 mt-2">
+                        <button type="button" class="btn btn-ghost btn-sm" @click="resetForm()">
+                            {% trans "Cancel" %}
+                        </button>
+                        <button type="submit" class="btn btn-sm color-primary">
+                            {% icon "add-outline" %}
+                            {% trans "Add Rule" %}
+                        </button>
+                    </div>
+                </form>
+            </template>
+
+            <!-- Edit Rule Form -->
+            <template x-if="editingRule">
+                <form :hx-post="editingRule.editUrl"
+                      hx-target="#segment-detail-area"
+                      hx-swap="outerHTML"
+                      @htmx:after-request="resetForm()"
+                      class="flex flex-col gap-3">
+                    {% csrf_token %}
+
+                    <!-- Field -->
+                    <div>
+                        <label class="text-sm font-medium mb-1 block">{% trans "Field" %}</label>
+                        <select name="field" class="select w-full" x-model="selectedField" required>
+                            <option value="">{% trans "Select field..." %}</option>
+                            {% for value, label in field_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Operator -->
+                    <div>
+                        <label class="text-sm font-medium mb-1 block">{% trans "Operator" %}</label>
+                        <select name="operator" class="select w-full" x-model="selectedOperator" required>
+                            <option value="">{% trans "Select operator..." %}</option>
+                            {% for value, label in operator_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Value -->
+                    <div x-show="needsValue" x-transition>
+                        <label class="text-sm font-medium mb-1 block">{% trans "Value" %}</label>
+                        <template x-if="currentValueType === 'boolean'">
+                            <select name="value" class="select w-full" x-model="ruleValue">
+                                <option value="true">{% trans "Yes" %}</option>
+                                <option value="false">{% trans "No" %}</option>
+                            </select>
+                        </template>
+                        <template x-if="currentValueType === 'number'">
+                            <input type="number" name="value" class="input w-full"
+                                   placeholder="{% trans 'Enter a number...' %}"
+                                   x-model="ruleValue"
+                                   step="any">
+                        </template>
+                        <template x-if="currentValueType === 'date'">
+                            <input type="number" name="value" class="input w-full"
+                                   placeholder="{% trans 'Number of days...' %}"
+                                   x-model="ruleValue"
+                                   min="0">
+                        </template>
+                        <template x-if="currentValueType === 'string'">
+                            <input type="text" name="value" class="input w-full"
+                                   placeholder="{% trans 'Enter value...' %}"
+                                   x-model="ruleValue">
+                        </template>
+                    </div>
+
+                    <!-- Hidden value type -->
+                    <input type="hidden" name="value_type" :value="currentValueType">
+
+                    <div class="flex justify-end gap-2 mt-2">
+                        <button type="button" class="btn btn-ghost btn-sm" @click="resetForm()">
+                            {% trans "Cancel" %}
+                        </button>
+                        <button type="submit" class="btn btn-sm color-primary">
+                            {% icon "checkmark-outline" %}
+                            {% trans "Save Rule" %}
+                        </button>
+                    </div>
+                </form>
+            </template>
+        </div>
+    </div>
+</div>
+
+<!-- Segment Info Card -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            {% icon "information-circle-outline" css_class="text-primary" %}
+            {% trans "Segment Info" %}
+        </h3>
+    </div>
+    <div class="card-body p-0">
+        <div class="list">
+            <div class="list-item">
+                <div class="list-item-content">
+                    <div class="list-item-note">{% trans "Logic" %}</div>
+                    <div class="list-item-label">
+                        {% if segment.logic_operator == 'and' %}
+                        {% trans "All rules must match (AND)" %}
+                        {% else %}
+                        {% trans "Any rule must match (OR)" %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="list-item">
+                <div class="list-item-content">
+                    <div class="list-item-note">{% trans "Type" %}</div>
+                    <div class="list-item-label">
+                        {% if segment.is_dynamic %}{% trans "Dynamic" %}{% else %}{% trans "Static" %}{% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="list-item">
+                <div class="list-item-content">
+                    <div class="list-item-note">{% trans "Created" %}</div>
+                    <div class="list-item-label">{{ segment.created_at|date:"d/m/Y H:i" }}</div>
+                </div>
+            </div>
+            {% if segment.last_calculated_at %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <div class="list-item-note">{% trans "Last Refreshed" %}</div>
+                    <div class="list-item-label">{{ segment.last_calculated_at|date:"d/m/Y H:i" }}</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

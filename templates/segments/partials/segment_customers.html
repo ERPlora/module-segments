@@ -1,0 +1,100 @@
+{% load djicons i18n %}
+
+<div class="card" id="segment-customers-body">
+    <div class="card-header">
+        <h3 class="card-title">
+            {% icon "people-outline" css_class="text-primary" %}
+            {% trans "Matching Customers" %}
+            <span class="badge badge-sm color-{{ segment.color }} ml-2">{{ page_obj.paginator.count }}</span>
+        </h3>
+    </div>
+
+    <div class="card-body p-0">
+        {% if customers %}
+        <div class="list">
+            {% for customer in customers %}
+            <a class="list-item list-item-clickable"
+               hx-get="/m/customers/{{ customer.id }}/"
+               hx-target="#main-content-area"
+               hx-push-url="true">
+                <div class="list-item-start">
+                    {% if customer.avatar %}
+                    <div class="avatar" style="background-image: url('{{ customer.avatar.url }}');"></div>
+                    {% else %}
+                    <div class="avatar avatar-primary">
+                        <span>{{ customer.initials }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="list-item-content">
+                    <div class="list-item-label">{{ customer.name }}</div>
+                    <div class="list-item-note">
+                        {% if customer.email %}{{ customer.email }}{% endif %}
+                        {% if customer.email and customer.phone %} &middot; {% endif %}
+                        {% if customer.phone %}{{ customer.phone }}{% endif %}
+                    </div>
+                </div>
+                <div class="list-item-end">
+                    <div class="text-right">
+                        {% if customer.total_spent %}
+                        <div class="text-sm font-semibold text-success">{{ customer.total_spent|floatformat:2 }} &euro;</div>
+                        {% endif %}
+                        {% if customer.is_active %}
+                        <span class="badge badge-sm color-success">{% trans "Active" %}</span>
+                        {% else %}
+                        <span class="badge badge-sm color-warning">{% trans "Inactive" %}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="flex items-center justify-between p-4 border-t border-base-300">
+            <span class="text-sm text-base-content/60">
+                {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}
+                Showing {{ start }}-{{ end }} of {{ total }}
+                {% endblocktrans %}
+            </span>
+            <nav class="pagination pagination-sm">
+                <button class="pagination-btn pagination-prev"
+                        {% if page_obj.has_previous %}
+                        hx-get="{% url 'segments:detail' segment_id=segment.id %}?page={{ page_obj.previous_page_number }}"
+                        hx-target="#segment-customers-body"
+                        hx-swap="outerHTML"
+                        {% else %}disabled{% endif %}>
+                    {% icon "chevron-back-outline" %}
+                </button>
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.paginator.num_pages <= 7 or num == 1 or num == page_obj.paginator.num_pages or num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+                <button class="pagination-btn{% if num == page_obj.number %} pagination-active{% endif %}"
+                        hx-get="{% url 'segments:detail' segment_id=segment.id %}?page={{ num }}"
+                        hx-target="#segment-customers-body"
+                        hx-swap="outerHTML">
+                    {{ num }}
+                </button>
+                {% endif %}
+                {% endfor %}
+                <button class="pagination-btn pagination-next"
+                        {% if page_obj.has_next %}
+                        hx-get="{% url 'segments:detail' segment_id=segment.id %}?page={{ page_obj.next_page_number }}"
+                        hx-target="#segment-customers-body"
+                        hx-swap="outerHTML"
+                        {% else %}disabled{% endif %}>
+                    {% icon "chevron-forward-outline" %}
+                </button>
+            </nav>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-12 text-base-content/40">
+            {% icon "people-outline" css_class="text-5xl block mx-auto mb-2" %}
+            <p class="mt-2">{% trans "No customers match the current rules" %}</p>
+            <p class="text-xs mt-1">{% trans "Add or modify rules to target customers" %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>

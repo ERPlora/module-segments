@@ -1,0 +1,94 @@
+{% load djicons i18n %}
+
+<div x-data="{
+    panelOpen: false,
+    editUrl: '',
+    deleteConfirm: false,
+    deleteTarget: null,
+    openPanel(url) {
+        this.editUrl = url;
+        htmx.ajax('GET', url, { target: '#segment-panel-content', swap: 'innerHTML' });
+        this.panelOpen = true;
+    },
+    closePanel() {
+        this.panelOpen = false;
+    },
+    confirmDelete() {
+        if (this.deleteTarget) {
+            htmx.ajax('POST', this.deleteTarget.url, {
+                target: '#segments-list-body',
+                swap: 'innerHTML',
+                headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}' }
+            });
+        }
+        this.deleteConfirm = false;
+        this.deleteTarget = null;
+    }
+}">
+
+    <!-- Toolbar -->
+    <div class="flex items-center justify-between mb-4 mt-5 px-1">
+        <div class="flex items-center gap-3">
+            <label class="input input-sm" style="min-width: 250px;">
+                {% icon "search-outline" %}
+                <input type="search"
+                       name="q"
+                       placeholder="{% trans 'Search segments...' %}"
+                       value="{{ search_query|default:'' }}"
+                       autocomplete="off"
+                       hx-get="{% url 'segments:list' %}"
+                       hx-target="#segments-list-body"
+                       hx-trigger="input changed delay:300ms, search">
+            </label>
+        </div>
+        <div class="flex items-center gap-2">
+            <button class="btn btn-sm color-primary"
+                    @click="openPanel('{% url 'segments:add' %}')">
+                {% icon "add-outline" %}
+                {% trans "New Segment" %}
+            </button>
+        </div>
+    </div>
+
+    {% csrf_token %}
+
+    <!-- Segments List Body -->
+    <div id="segments-list-body">
+        {% include "segments/partials/segments_list.html" %}
+    </div>
+
+    <!-- Side Sheet -->
+    <div class="sheet-backdrop" :class="{ 'is-open': panelOpen }" @click.self="closePanel()">
+        <div class="side-sheet side-sheet-right" id="segment-panel-content">
+            <!-- Content loaded via HTMX -->
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-backdrop" :data-state="deleteConfirm ? 'open' : 'closed'" @click.self="deleteConfirm = false; deleteTarget = null">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3 class="modal-title">{% trans "Delete Segment" %}</h3>
+                <button class="modal-close" @click="deleteConfirm = false; deleteTarget = null">
+                    {% icon "close-outline" %}
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="text-sm text-base-content/70">
+                    {% trans "Are you sure you want to delete" %} <strong x-text="deleteTarget?.name"></strong>?
+                    {% trans "All rules in this segment will also be deleted." %}
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost btn-sm" @click="deleteConfirm = false; deleteTarget = null">
+                    {% trans "Cancel" %}
+                </button>
+                <button class="btn btn-sm color-error" @click="confirmDelete()">
+                    {% icon "trash-outline" %}
+                    {% trans "Delete" %}
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

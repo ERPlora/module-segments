@@ -1,0 +1,154 @@
+{% load djicons i18n %}
+
+<div class="p-4" x-data="{
+    deleteModal: false,
+    addRuleOpen: false,
+    editingRule: null,
+    selectedField: '',
+    selectedOperator: '',
+    ruleValue: '',
+    noValueOps: ['is_empty', 'is_not_empty'],
+    fieldTypes: {
+        'lifecycle_stage': 'string',
+        'source': 'string',
+        'total_spent': 'number',
+        'total_purchases': 'number',
+        'last_purchase_date': 'date',
+        'city': 'string',
+        'country': 'string',
+        'is_active': 'boolean',
+        'created_at': 'date',
+        'groups': 'string',
+        'birthday_month': 'number'
+    },
+    get needsValue() {
+        return !this.noValueOps.includes(this.selectedOperator);
+    },
+    get currentValueType() {
+        return this.fieldTypes[this.selectedField] || 'string';
+    },
+    startEdit(rule) {
+        this.editingRule = rule;
+        this.selectedField = rule.field;
+        this.selectedOperator = rule.operator;
+        this.ruleValue = rule.value;
+        this.addRuleOpen = true;
+    },
+    resetForm() {
+        this.editingRule = null;
+        this.selectedField = '';
+        this.selectedOperator = '';
+        this.ruleValue = '';
+        this.addRuleOpen = false;
+    }
+}" id="segment-detail-area">
+
+    <!-- Header with back button -->
+    <div class="flex items-center gap-4 mb-6">
+        <button class="btn btn-ghost btn-sm"
+                hx-get="{% url 'segments:list' %}"
+                hx-target="#main-content-area"
+                hx-push-url="true">
+            {% icon "arrow-back-outline" %}
+        </button>
+        <div class="flex-1">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center"
+                     style="background: color-mix(in srgb, var(--color-{{ segment.color }}, var(--color-primary)) 12%, transparent);">
+                    {% icon "pie-chart-outline" css_class="text-2xl" %}
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold">{{ segment.name }}</h1>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="badge badge-sm color-{{ segment.color }}">{{ segment.customer_count }} {% trans "customers" %}</span>
+                        {% if segment.is_active %}
+                        <span class="badge badge-sm color-success">{% trans "Active" %}</span>
+                        {% else %}
+                        <span class="badge badge-sm color-warning">{% trans "Inactive" %}</span>
+                        {% endif %}
+                        {% if segment.is_dynamic %}
+                        <span class="badge badge-sm">{% trans "Dynamic" %}</span>
+                        {% else %}
+                        <span class="badge badge-sm">{% trans "Static" %}</span>
+                        {% endif %}
+                        {% if segment.logic_operator == 'and' %}
+                        <span class="badge badge-sm">{% trans "AND" %}</span>
+                        {% else %}
+                        <span class="badge badge-sm color-warning">{% trans "OR" %}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <button class="btn btn-outline btn-sm"
+                    hx-post="{% url 'segments:refresh' segment_id=segment.id %}"
+                    hx-target="#segment-detail-area"
+                    hx-swap="outerHTML"
+                    title="{% trans 'Refresh count' %}">
+                {% icon "refresh-outline" %}
+                {% trans "Refresh" %}
+            </button>
+            <a class="btn btn-outline btn-sm"
+               href="{% url 'segments:export' segment_id=segment.id %}"
+               title="{% trans 'Export CSV' %}">
+                {% icon "download-outline" %}
+                {% trans "Export" %}
+            </a>
+            <button class="btn btn-outline btn-sm color-error"
+                    @click="deleteModal = true">
+                {% icon "trash-outline" %}
+            </button>
+        </div>
+    </div>
+
+    {% if segment.description %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <p class="text-sm text-base-content/70">{{ segment.description }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left Column: Rules -->
+        <div class="lg:col-span-1">
+            {% include "segments/partials/segment_rules.html" %}
+        </div>
+
+        <!-- Right Column: Matching Customers -->
+        <div class="lg:col-span-2">
+            {% include "segments/partials/segment_customers.html" %}
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-backdrop" :data-state="deleteModal ? 'open' : 'closed'" @click.self="deleteModal = false">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3 class="modal-title">{% trans "Delete Segment" %}</h3>
+                <button class="modal-close" @click="deleteModal = false">
+                    {% icon "close-outline" %}
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>{% trans "Are you sure you want to delete" %} <strong>{{ segment.name }}</strong>?</p>
+                <p class="text-sm text-base-content/60 mt-2">{% trans "All rules will be removed along with this segment." %}</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost btn-sm" @click="deleteModal = false">
+                    {% trans "Cancel" %}
+                </button>
+                <button class="btn btn-sm color-error"
+                        hx-post="{% url 'segments:delete' segment_id=segment.id %}"
+                        hx-target="#main-content-area"
+                        hx-swap="innerHTML"
+                        @click="deleteModal = false">
+                    {% icon "trash-outline" %}
+                    {% trans "Delete" %}
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
