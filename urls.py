@@ -4,23 +4,16 @@ from . import views
 app_name = 'segments'
 
 urlpatterns = [
-    # Segment list
-    path('', views.segment_list, name='list'),
+    # Dashboard
+    path('', views.dashboard, name='dashboard'),
 
-    # Segment CRUD
-    path('add/', views.segment_add, name='add'),
-    path('<uuid:segment_id>/', views.segment_detail, name='detail'),
-    path('<uuid:segment_id>/edit/', views.segment_edit, name='edit'),
-    path('<uuid:segment_id>/delete/', views.segment_delete, name='delete'),
-
-    # Segment actions
-    path('<uuid:segment_id>/refresh/', views.segment_refresh, name='refresh'),
-    path('<uuid:segment_id>/export/', views.segment_export, name='export'),
-
-    # Rules
-    path('<uuid:segment_id>/rules/add/', views.rule_add, name='rule_add'),
-    path('<uuid:segment_id>/rules/<uuid:rule_id>/edit/', views.rule_edit, name='rule_edit'),
-    path('<uuid:segment_id>/rules/<uuid:rule_id>/delete/', views.rule_delete, name='rule_delete'),
+    # Segment
+    path('segments/', views.segments_list, name='segments_list'),
+    path('segments/add/', views.segment_add, name='segment_add'),
+    path('segments/<uuid:pk>/edit/', views.segment_edit, name='segment_edit'),
+    path('segments/<uuid:pk>/delete/', views.segment_delete, name='segment_delete'),
+    path('segments/<uuid:pk>/toggle/', views.segment_toggle_status, name='segment_toggle_status'),
+    path('segments/bulk/', views.segments_bulk_action, name='segments_bulk_action'),
 
     # Settings
     path('settings/', views.settings_view, name='settings'),

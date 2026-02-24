@@ -1,146 +1,133 @@
 {% load djicons i18n %}
 
 {% if segments %}
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    {% for segment in segments %}
-    <div class="card segment-card">
-        <div class="card-body">
-            <!-- Header -->
-            <div class="flex items-start justify-between mb-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center"
-                         style="background: var(--color-{{ segment.color }}, var(--color-primary)) / 0.12;">
-                        <span class="w-3 h-3 rounded-full" style="background: var(--color-{{ segment.color }}, var(--color-primary));"></span>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-base">{{ segment.name }}</h3>
-                        {% if not segment.is_active %}
-                        <span class="badge badge-sm color-warning">{% trans "Inactive" %}</span>
-                        {% endif %}
-                        {% if not segment.is_dynamic %}
-                        <span class="badge badge-sm">{% trans "Static" %}</span>
-                        {% endif %}
-                    </div>
-                </div>
-                <details class="dropdown" x-data="{ open: false }" :open="open" @click.outside="open = false">
-                    <summary class="btn btn-ghost btn-sm btn-circle" @click.prevent="open = !open">
-                        {% icon "ellipsis-vertical-outline" %}
-                    </summary>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item"
-                           hx-get="{% url 'segments:detail' segment_id=segment.id %}"
-                           hx-target="#main-content-area"
-                           hx-push-url="true"
-                           @click="open = false">
-                            {% icon "eye-outline" %}
-                            {% trans "View Details" %}
-                        </a>
-                        <button class="dropdown-item"
-                                @click="open = false; openPanel('{% url 'segments:edit' segment_id=segment.id %}')"
-                                >
+<div class="datatable-body">
+    <table class="datatable-table">
+        <thead class="datatable-thead">
+            <tr>
+                <th class="datatable-th datatable-th-checkbox">
+                    <label class="checkbox checkbox-sm">
+                        <input type="checkbox" :checked="selectAll" @click="toggleAll([{% for item in segments %}'{{ item.id }}'{% if not forloop.last %},{% endif %}{% endfor %}])">
+                        <span class="checkbox-mark"></span>
+                    </label>
+                </th>
+                <th class="datatable-th datatable-th-sortable{% if sort_field == 'name' %} datatable-th-sorted{% if sort_dir == 'desc' %} datatable-th-sorted-desc{% endif %}{% endif %}"
+                    hx-get="{% url 'segments:segments_list' %}?sort=name&dir={% if sort_field == 'name' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}"
+                    hx-target="#datatable-body" hx-include="#segments-datatable" style="cursor: pointer;">
+                    {% trans "Name" %}
+                    <span class="datatable-sort-icon">{% icon "chevron-up-outline" %}</span>
+                </th>
+                <th class="datatable-th datatable-th-sortable{% if sort_field == 'color' %} datatable-th-sorted{% if sort_dir == 'desc' %} datatable-th-sorted-desc{% endif %}{% endif %}"
+                    hx-get="{% url 'segments:segments_list' %}?sort=color&dir={% if sort_field == 'color' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}"
+                    hx-target="#datatable-body" hx-include="#segments-datatable" style="cursor: pointer;">
+                    {% trans "Color" %}
+                    <span class="datatable-sort-icon">{% icon "chevron-up-outline" %}</span>
+                </th>
+                <th class="datatable-th datatable-th-center">{% trans "Status" %}</th>
+                <th class="datatable-th datatable-th-sortable{% if sort_field == 'is_dynamic' %} datatable-th-sorted{% if sort_dir == 'desc' %} datatable-th-sorted-desc{% endif %}{% endif %}"
+                    hx-get="{% url 'segments:segments_list' %}?sort=is_dynamic&dir={% if sort_field == 'is_dynamic' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}"
+                    hx-target="#datatable-body" hx-include="#segments-datatable" style="cursor: pointer;">
+                    {% trans "Is Dynamic" %}
+                    <span class="datatable-sort-icon">{% icon "chevron-up-outline" %}</span>
+                </th>
+                <th class="datatable-th datatable-th-sortable{% if sort_field == 'logic_operator' %} datatable-th-sorted{% if sort_dir == 'desc' %} datatable-th-sorted-desc{% endif %}{% endif %}"
+                    hx-get="{% url 'segments:segments_list' %}?sort=logic_operator&dir={% if sort_field == 'logic_operator' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}"
+                    hx-target="#datatable-body" hx-include="#segments-datatable" style="cursor: pointer;">
+                    {% trans "Logic Operator" %}
+                    <span class="datatable-sort-icon">{% icon "chevron-up-outline" %}</span>
+                </th>
+                <th class="datatable-th datatable-th-sortable{% if sort_field == 'customer_count' %} datatable-th-sorted{% if sort_dir == 'desc' %} datatable-th-sorted-desc{% endif %}{% endif %}"
+                    hx-get="{% url 'segments:segments_list' %}?sort=customer_count&dir={% if sort_field == 'customer_count' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}"
+                    hx-target="#datatable-body" hx-include="#segments-datatable" style="cursor: pointer;">
+                    {% trans "Customer Count" %}
+                    <span class="datatable-sort-icon">{% icon "chevron-up-outline" %}</span>
+                </th>
+                <th class="datatable-th datatable-th-actions">{% trans "Actions" %}</th>
+            </tr>
+        </thead>
+        <tbody class="datatable-tbody">
+            {% for item in segments %}
+            <tr class="datatable-tr" data-id="{{ item.id }}" :class="{ 'datatable-tr-selected': selectedIds.includes('{{ item.id }}') }">
+                <td class="datatable-td datatable-td-checkbox" onclick="event.stopPropagation();">
+                    <label class="checkbox checkbox-sm">
+                        <input type="checkbox" :checked="selectedIds.includes('{{ item.id }}')" @click="toggleSelect('{{ item.id }}')">
+                        <span class="checkbox-mark"></span>
+                    </label>
+                </td>
+                <td class="datatable-td">
+                    <span class="font-medium cursor-pointer" @click="openPanel('{% url 'segments:segment_edit' item.id %}')">{{ item.name }}</span>
+                </td>
+                <td class="datatable-td">{{ item.color }}</td>
+                <td class="datatable-td datatable-td-center" onclick="event.stopPropagation();">
+                    <label class="toggle toggle-sm color-success">
+                        <input type="checkbox" {% if item.is_active %}checked{% endif %}
+                               hx-post="{% url 'segments:segment_toggle_status' item.id %}"
+                               hx-target="#datatable-body" hx-include="#segments-datatable">
+                        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                    </label>
+                </td>
+                <td class="datatable-td">
+                    {% if item.is_dynamic %}<span class="badge badge-sm color-success">{% trans "Yes" %}</span>
+                    {% else %}<span class="badge badge-sm">{% trans "No" %}</span>{% endif %}
+                </td>
+                <td class="datatable-td">{{ item.logic_operator }}</td>
+                <td class="datatable-td">{{ item.customer_count }}</td>
+                <td class="datatable-td datatable-td-actions" onclick="event.stopPropagation();">
+                    <div class="datatable-row-actions">
+                        <button class="datatable-row-action" @click="openPanel('{% url 'segments:segment_edit' item.id %}')" title="{% trans 'Edit' %}">
                             {% icon "create-outline" %}
-                            {% trans "Edit" %}
                         </button>
-                        <button class="dropdown-item"
-                                hx-post="{% url 'segments:refresh' segment_id=segment.id %}"
-                                hx-target="#segments-list-body"
-                                hx-swap="innerHTML"
-                                @click="open = false">
-                            {% icon "refresh-outline" %}
-                            {% trans "Refresh Count" %}
-                        </button>
-                        <a class="dropdown-item"
-                           href="{% url 'segments:export' segment_id=segment.id %}"
-                           @click="open = false">
-                            {% icon "download-outline" %}
-                            {% trans "Export CSV" %}
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item text-error"
-                                @click="open = false; deleteTarget = { id: '{{ segment.id }}', name: '{{ segment.name|escapejs }}', url: '{% url 'segments:delete' segment_id=segment.id %}' }; deleteConfirm = true">
+                        <button class="datatable-row-action datatable-row-action-danger"
+                                @click="deleteTarget = { id: '{{ item.id }}', name: '{{ item.name }}', url: '{% url 'segments:segment_delete' item.id %}' }; deleteConfirm = true"
+                                title="{% trans 'Delete' %}">
                             {% icon "trash-outline" %}
-                            {% trans "Delete" %}
                         </button>
                     </div>
-                </details>
-            </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-            <!-- Description -->
-            {% if segment.description %}
-            <p class="text-sm text-base-content/60 mb-3 line-clamp-2">{{ segment.description }}</p>
-            {% endif %}
-
-            <!-- Stats -->
-            <div class="flex items-center justify-between mt-auto pt-3 border-t border-base-300">
-                <div class="flex items-center gap-2">
-                    {% icon "people-outline" css_class="text-base-content/40" %}
-                    <span class="text-sm font-semibold">{{ segment.customer_count }}</span>
-                    <span class="text-sm text-base-content/50">{% trans "customers" %}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    {% if segment.logic_operator == 'and' %}
-                    <span class="badge badge-sm">{% trans "AND" %}</span>
-                    {% else %}
-                    <span class="badge badge-sm color-warning">{% trans "OR" %}</span>
-                    {% endif %}
-                    <span class="badge badge-sm color-{{ segment.color }}">
-                        {{ segment.rules.count }} {% trans "rules" %}
-                    </span>
-                </div>
-            </div>
-
-            <!-- Last calculated -->
-            {% if segment.last_calculated_at %}
-            <div class="text-xs text-base-content/40 mt-2">
-                {% trans "Last updated" %}: {{ segment.last_calculated_at|timesince }} {% trans "ago" %}
-            </div>
-            {% else %}
-            <div class="text-xs text-base-content/40 mt-2">
-                {% trans "Not yet calculated" %}
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- Clickable overlay to detail -->
-        <a class="absolute inset-0 z-0"
-           hx-get="{% url 'segments:detail' segment_id=segment.id %}"
-           hx-target="#main-content-area"
-           hx-push-url="true"
-           style="cursor: pointer;"></a>
+<div class="datatable-footer">
+    <div class="datatable-per-page">
+        {% trans "Show" %}
+        <select name="per_page" hx-get="{% url 'segments:segments_list' %}" hx-target="#datatable-body" hx-include="#segments-datatable" hx-trigger="change">
+            <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+            <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+            <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+            <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+        </select>
+        {% trans "per page" %}
     </div>
-    {% endfor %}
+    <span class="datatable-info">
+        {% if page_obj.paginator.count > 0 %}
+        {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}Showing {{ start }}-{{ end }} of {{ total }}{% endblocktrans %}
+        {% endif %}
+    </span>
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="pagination pagination-sm">
+        <button class="pagination-btn pagination-prev" {% if page_obj.has_previous %}hx-get="{% url 'segments:segments_list' %}?page={{ page_obj.previous_page_number }}" hx-target="#datatable-body" hx-include="#segments-datatable"{% else %}disabled{% endif %}>
+            {% icon "chevron-back-outline" %}
+        </button>
+        {% for num in page_obj.paginator.page_range %}
+        <button class="pagination-btn{% if num == page_obj.number %} pagination-active{% endif %}" hx-get="{% url 'segments:segments_list' %}?page={{ num }}" hx-target="#datatable-body" hx-include="#segments-datatable">{{ num }}</button>
+        {% endfor %}
+        <button class="pagination-btn pagination-next" {% if page_obj.has_next %}hx-get="{% url 'segments:segments_list' %}?page={{ page_obj.next_page_number }}" hx-target="#datatable-body" hx-include="#segments-datatable"{% else %}disabled{% endif %}>
+            {% icon "chevron-forward-outline" %}
+        </button>
+    </nav>
+    {% endif %}
 </div>
 
 {% else %}
-<!-- Empty State -->
-<div class="text-center py-20">
-    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-base-200 mb-4">
-        {% if search_query %}
-        {% icon "search-outline" css_class="text-4xl text-base-content/30" %}
-        {% else %}
-        {% icon "pie-chart-outline" css_class="text-4xl text-base-content/30" %}
-        {% endif %}
-    </div>
-    <div class="text-lg font-semibold text-base-content/50 mb-1">
-        {% if search_query %}
-        {% trans "No segments found" %}
-        {% else %}
-        {% trans "No segments yet" %}
-        {% endif %}
-    </div>
-    <div class="text-sm text-base-content/40 mb-4">
-        {% if search_query %}
-        {% trans "Try a different search term" %}
-        {% else %}
-        {% trans "Create your first segment to start organizing customers" %}
-        {% endif %}
-    </div>
-    {% if not search_query %}
-    <button class="btn color-primary"
-            @click="openPanel('{% url 'segments:add' %}')">
-        {% icon "add-outline" %}
-        {% trans "Create First Segment" %}
+<div class="datatable-empty">
+    <div class="datatable-empty-icon">{% icon "cube-outline" %}</div>
+    <div class="datatable-empty-title">{% trans "No items yet" %}</div>
+    <div class="datatable-empty-text">{% trans "Add your first item to get started" %}</div>
+    <button class="btn color-primary mt-4" @click="openPanel('{% url 'segments:segment_add' %}')">
+        {% icon "add-outline" %} {% trans "Add" %}
     </button>
-    {% endif %}
 </div>
 {% endif %}

@@ -1,0 +1,49 @@
+{% load djicons i18n %}
+
+<div class="p-4">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold">{% trans "Segments" %}</h1>
+        <p class="text-sm mt-1 opacity-60">{% trans "Dynamic customer segmentation with rule-based filters" %}</p>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                        {% icon "cube-outline" css_class="text-xl text-primary" %}
+                    </div>
+                    <div>
+                        <div class="text-xs opacity-60">{% trans "Total Segments" %}</div>
+                        <div class="text-xl font-semibold">{{ total_segments }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{% trans "Quick Actions" %}</h3>
+        </div>
+        <div class="list list-inset">
+            <a class="list-item list-item-clickable"
+               hx-get="{% url 'segments:segments_list' %}"
+               hx-target="#main-content-area"
+               hx-push-url="true">
+                <div class="list-item-start">
+                    <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                        {% icon "list-outline" css_class="text-xl text-primary" %}
+                    </div>
+                </div>
+                <div class="list-item-content">
+                    <div class="list-item-label">{% trans "Manage Segments" %}</div>
+                    <div class="list-item-note">{% trans "View and manage all segments" %}</div>
+                </div>
+                <div class="list-item-end">
+                    <span class="list-item-chevron">{% icon "chevron-forward-outline" %}</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>

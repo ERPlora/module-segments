@@ -1,158 +1,33 @@
 {% load djicons i18n %}
 
 <div class="p-4">
-    <!-- Overview Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold">{% trans "Settings" %}</h1>
+        <p class="text-sm mt-1 opacity-60">{% trans "Module configuration" %}</p>
+    </div>
+
+    <form hx-post="{% url 'segments:settings' %}" hx-swap="none">
+        {% csrf_token %}
         <div class="card">
-            <div class="card-body p-6">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                        {% icon "pie-chart-outline" css_class="text-2xl text-primary" %}
+            <div class="card-body divide-y divide-base-300">
+                <div class="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                    <div class="flex-1 pr-4">
+                        <h3 class="font-semibold text-sm">{% trans "Auto Refresh Minutes" %}</h3>
                     </div>
-                    <div>
-                        <div class="text-sm text-base-content/60">{% trans "Total Segments" %}</div>
-                        <div class="text-2xl font-semibold">{{ total_segments }}</div>
+                    <input type="number" name="auto_refresh_minutes" class="input input-sm w-48" value="{{ config.auto_refresh_minutes }}">
+                </div>
+                <div class="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                    <div class="flex-1 pr-4">
+                        <h3 class="font-semibold text-sm">{% trans "Max Segment Size" %}</h3>
                     </div>
+                    <input type="number" name="max_segment_size" class="input input-sm w-48" value="{{ config.max_segment_size }}">
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-body p-6">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
-                        {% icon "checkmark-circle-outline" css_class="text-2xl text-success" %}
-                    </div>
-                    <div>
-                        <div class="text-sm text-base-content/60">{% trans "Active Segments" %}</div>
-                        <div class="text-2xl font-semibold text-success">{{ total_active }}</div>
-                    </div>
-                </div>
-            </div>
+        <div class="flex justify-end mt-4">
+            <button type="submit" class="btn color-primary">
+                {% icon "checkmark-outline" %} {% trans "Save Settings" %}
+            </button>
         </div>
-        <div class="card">
-            <div class="card-body p-6">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
-                        {% icon "filter-outline" css_class="text-2xl text-warning" %}
-                    </div>
-                    <div>
-                        <div class="text-sm text-base-content/60">{% trans "Total Rules" %}</div>
-                        <div class="text-2xl font-semibold">{{ total_rules }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Form -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3 class="card-title">{% icon "settings-outline" css_class="text-primary" %} {% trans "Segment Settings" %}</h3>
-        </div>
-        <div class="card-body">
-            <form hx-post="{% url 'segments:settings' %}"
-                  hx-target="#main-content-area"
-                  hx-swap="innerHTML"
-                  class="flex flex-col gap-4">
-                {% csrf_token %}
-
-                <!-- Auto-refresh interval -->
-                <div class="form-group">
-                    <label class="form-group-label">{% trans "Auto-refresh Interval (minutes)" %}</label>
-                    <input type="number" name="auto_refresh_minutes" class="input"
-                           value="{{ settings.auto_refresh_minutes }}"
-                           min="0" placeholder="0">
-                    <p class="text-xs text-base-content/50 mt-1">
-                        {% trans "How often to automatically recalculate segment counts. Set to 0 to disable." %}
-                    </p>
-                </div>
-
-                <!-- Max segment size -->
-                <div class="form-group">
-                    <label class="form-group-label">{% trans "Max Segment Size" %}</label>
-                    <input type="number" name="max_segment_size" class="input"
-                           value="{{ settings.max_segment_size }}"
-                           min="0" placeholder="10000">
-                    <p class="text-xs text-base-content/50 mt-1">
-                        {% trans "Maximum number of customers per segment. Set to 0 for unlimited." %}
-                    </p>
-                </div>
-
-                <div class="flex justify-end">
-                    <button type="submit" class="btn color-primary">
-                        {% icon "checkmark-outline" %}
-                        {% trans "Save Settings" %}
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3 class="card-title">{% icon "flash-outline" css_class="text-primary" %} {% trans "Quick Actions" %}</h3>
-        </div>
-        <div class="card-body p-0">
-            <div class="list">
-                <a hx-get="{% url 'segments:list' %}"
-                   hx-target="#main-content-area"
-                   hx-push-url="true"
-                   class="list-item list-item-clickable">
-                    <div class="list-item-start">
-                        {% icon "pie-chart-outline" css_class="text-xl text-primary" %}
-                    </div>
-                    <div class="list-item-content">
-                        <div class="list-item-label">{% trans "View All Segments" %}</div>
-                        <div class="list-item-note">{% trans "Browse and manage your customer segments" %}</div>
-                    </div>
-                    <div class="list-item-end">
-                        <span class="list-item-chevron"></span>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Data Info -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3 class="card-title">{% icon "server-outline" css_class="text-warning" %} {% trans "Data Management" %}</h3>
-        </div>
-        <div class="card-body p-0">
-            <div class="list">
-                <div class="list-item">
-                    <div class="list-item-content">
-                        <div class="list-item-label">{% trans "Segment Records" %}</div>
-                        <div class="list-item-note">{% trans "Total segments in the database" %}</div>
-                    </div>
-                    <div class="list-item-end">
-                        <span class="badge color-primary">{{ total_segments }}</span>
-                    </div>
-                </div>
-                <div class="list-item">
-                    <div class="list-item-content">
-                        <div class="list-item-label">{% trans "Active Rate" %}</div>
-                        <div class="list-item-note">{% trans "Percentage of active segments" %}</div>
-                    </div>
-                    <div class="list-item-end">
-                        {% if total_segments %}
-                        <span class="badge color-success">{% widthratio total_active total_segments 100 %}%</span>
-                        {% else %}
-                        <span class="badge">0%</span>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="list-item">
-                    <div class="list-item-content">
-                        <div class="list-item-label">{% trans "Total Rules" %}</div>
-                        <div class="list-item-note">{% trans "Rules across all segments" %}</div>
-                    </div>
-                    <div class="list-item-end">
-                        <span class="badge color-warning">{{ total_rules }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    </form>
 </div>

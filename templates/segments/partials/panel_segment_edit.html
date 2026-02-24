@@ -2,153 +2,107 @@
 
 <div x-data="{ confirmDelete: false }">
 
-    <!-- Header -->
-    <div class="side-sheet-header">
-        <h3 class="sheet-title">{% trans "Edit Segment" %}</h3>
-        <button class="sheet-close" @click="closePanel()">
-            {% icon "close-outline" %}
+<div class="side-sheet-header">
+    <h3 class="sheet-title">{% trans "Edit Segment" %}</h3>
+    <button class="sheet-close" @click="closePanel()">{% icon "close-outline" %}</button>
+</div>
+
+<div class="side-sheet-content">
+    <form id="edit-segment-form"
+          hx-post="{% url 'segments:segment_edit' obj.id %}"
+          hx-target="#datatable-body"
+          hx-swap="innerHTML"
+          @htmx:after-request="closePanel()"
+          class="flex flex-col gap-4 p-6">
+        {% csrf_token %}
+
+        {% if error %}
+        <div class="callout callout-error">
+            <div class="callout-content"><span class="callout-text">{{ error }}</span></div>
+        </div>
+        {% endif %}
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Name" %}</label>
+            <input type="text" name="name" class="input input-sm w-full" value="{{ obj.name }}">
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Description" %}</label>
+            <textarea name="description" class="textarea textarea-sm w-full" rows="3">{{ obj.description }}</textarea>
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Color" %}</label>
+            <select name="color" class="select select-sm w-full">
+                <option value="">---</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Is Active" %}</label>
+            <label class="toggle color-success">
+                <input type="checkbox" name="is_active" {% if obj.is_active %}checked{% endif %}>
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Is Dynamic" %}</label>
+            <label class="toggle color-success">
+                <input type="checkbox" name="is_dynamic" {% if obj.is_dynamic %}checked{% endif %}>
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Customer Count" %}</label>
+            <input type="number" name="customer_count" class="input input-sm w-full" value="{{ obj.customer_count }}">
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Last Calculated At" %}</label>
+            <input type="datetime-local" name="last_calculated_at" class="input input-sm w-full" value="{{ obj.last_calculated_at }}">
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Logic Operator" %}</label>
+            <select name="logic_operator" class="select select-sm w-full">
+                <option value="">---</option>
+            </select>
+        </div>
+    </form>
+
+    <div class="border-t border-base-300 pt-4 mt-4 px-6 pb-6">
+        <h4 class="font-semibold text-sm mb-3 text-error">{% trans "Danger Zone" %}</h4>
+        <template x-if="!confirmDelete">
+            <button type="button" class="btn btn-sm btn-outline color-error w-full" @click="confirmDelete = true">
+                {% icon "trash-outline" %} {% trans "Delete" %}
+            </button>
+        </template>
+        <template x-if="confirmDelete">
+            <div>
+                <p class="text-error text-sm font-semibold mb-3">{% trans "Are you sure?" %}</p>
+                <div class="flex gap-2">
+                    <button type="button" class="btn btn-sm btn-outline flex-1" @click="confirmDelete = false">{% trans "Cancel" %}</button>
+                    <button type="button" class="btn btn-sm color-error flex-1"
+                            hx-post="{% url 'segments:segment_delete' obj.id %}"
+                            hx-target="#datatable-body" hx-swap="innerHTML" @click="closePanel()">
+                        {% icon "trash-outline" %} {% trans "Delete" %}
+                    </button>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
+
+<div class="side-sheet-footer">
+    <div class="flex justify-end gap-2">
+        <button type="button" class="btn btn-ghost btn-sm" @click="closePanel()">{% trans "Cancel" %}</button>
+        <button type="submit" form="edit-segment-form" class="btn btn-sm color-primary">
+            {% icon "checkmark-outline" %} {% trans "Save" %}
         </button>
     </div>
-
-    <!-- Body -->
-    <div class="side-sheet-content">
-        <form id="edit-segment-form"
-              hx-post="{% url 'segments:edit' segment_id=segment.id %}"
-              hx-target="#segments-list-body"
-              hx-swap="innerHTML"
-              @htmx:after-request="closePanel()"
-              class="flex flex-col gap-4 p-6">
-            {% csrf_token %}
-
-            <!-- Name -->
-            <div>
-                <label class="text-sm font-medium mb-1 block">{% trans "Name" %} *</label>
-                <input type="text" name="name" class="input input-sm w-full"
-                       value="{{ segment.name }}"
-                       placeholder="{% trans 'Segment name' %}" required>
-            </div>
-
-            <!-- Description -->
-            <div>
-                <label class="text-sm font-medium mb-1 block">{% trans "Description" %}</label>
-                <textarea name="description" class="textarea textarea-sm w-full" rows="2"
-                          placeholder="{% trans 'Describe what this segment represents...' %}">{{ segment.description }}</textarea>
-            </div>
-
-            <!-- Color -->
-            <div>
-                <label class="text-sm font-medium mb-1 block">{% trans "Color" %}</label>
-                <select name="color" class="select select-sm w-full">
-                    <option value="primary" {% if segment.color == 'primary' %}selected{% endif %}>{% trans "Primary" %}</option>
-                    <option value="success" {% if segment.color == 'success' %}selected{% endif %}>{% trans "Success" %}</option>
-                    <option value="warning" {% if segment.color == 'warning' %}selected{% endif %}>{% trans "Warning" %}</option>
-                    <option value="error" {% if segment.color == 'error' %}selected{% endif %}>{% trans "Error" %}</option>
-                    <option value="neutral" {% if segment.color == 'neutral' %}selected{% endif %}>{% trans "Neutral" %}</option>
-                </select>
-            </div>
-
-            <!-- Logic Operator -->
-            <div>
-                <label class="text-sm font-medium mb-1 block">{% trans "Rule Logic" %}</label>
-                <select name="logic_operator" class="select select-sm w-full">
-                    <option value="and" {% if segment.logic_operator == 'and' %}selected{% endif %}>{% trans "All rules must match (AND)" %}</option>
-                    <option value="or" {% if segment.logic_operator == 'or' %}selected{% endif %}>{% trans "Any rule must match (OR)" %}</option>
-                </select>
-            </div>
-
-            <!-- Dynamic -->
-            <div class="flex items-center justify-between">
-                <div>
-                    <label class="text-sm font-medium block">{% trans "Dynamic Segment" %}</label>
-                    <p class="text-xs text-base-content/50">{% trans "Auto-updates when rules change" %}</p>
-                </div>
-                <label class="toggle toggle-sm color-primary">
-                    <input type="checkbox" name="is_dynamic" {% if segment.is_dynamic %}checked{% endif %}>
-                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                </label>
-            </div>
-
-            <!-- Active -->
-            <div class="flex items-center justify-between">
-                <div>
-                    <label class="text-sm font-medium block">{% trans "Active" %}</label>
-                    <p class="text-xs text-base-content/50">{% trans "Inactive segments won't be evaluated" %}</p>
-                </div>
-                <label class="toggle toggle-sm color-success">
-                    <input type="checkbox" name="is_active" {% if segment.is_active %}checked{% endif %}>
-                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                </label>
-            </div>
-        </form>
-
-        <!-- Stats -->
-        <div class="border-t border-base-300 pt-4 mt-4 px-6">
-            <h4 class="font-semibold text-sm mb-3">{% trans "Statistics" %}</h4>
-            <div class="flex flex-col gap-2 text-sm">
-                <div class="flex justify-between">
-                    <span class="text-base-content/60">{% trans "Customers" %}</span>
-                    <span class="font-medium">{{ segment.customer_count }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-base-content/60">{% trans "Rules" %}</span>
-                    <span class="font-medium">{{ segment.rules.count }}</span>
-                </div>
-                {% if segment.last_calculated_at %}
-                <div class="flex justify-between">
-                    <span class="text-base-content/60">{% trans "Last Calculated" %}</span>
-                    <span class="font-medium">{{ segment.last_calculated_at|date:"d/m/Y H:i" }}</span>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Delete Section -->
-        <div class="border-t border-base-300 pt-4 mt-4 px-6 pb-6">
-            <h4 class="font-semibold text-sm mb-3 text-error">{% trans "Danger Zone" %}</h4>
-
-            <template x-if="!confirmDelete">
-                <button type="button" class="btn btn-sm btn-outline color-error w-full"
-                        @click="confirmDelete = true">
-                    {% icon "trash-outline" %}
-                    {% trans "Delete Segment" %}
-                </button>
-            </template>
-
-            <template x-if="confirmDelete">
-                <div>
-                    <p class="text-error text-sm font-semibold mb-3">
-                        {% trans "Are you sure? All rules will also be deleted." %}
-                    </p>
-                    <div class="flex gap-2">
-                        <button type="button" class="btn btn-sm btn-outline flex-1"
-                                @click="confirmDelete = false">
-                            {% trans "Cancel" %}
-                        </button>
-                        <button type="button" class="btn btn-sm color-error flex-1"
-                                hx-post="{% url 'segments:delete' segment_id=segment.id %}"
-                                hx-target="#segments-list-body"
-                                hx-swap="innerHTML"
-                                @click="closePanel()">
-                            {% icon "trash-outline" %}
-                            {% trans "Delete" %}
-                        </button>
-                    </div>
-                </div>
-            </template>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="side-sheet-footer">
-        <div class="flex justify-end gap-2">
-            <button type="button" class="btn btn-ghost btn-sm" @click="closePanel()">
-                {% trans "Cancel" %}
-            </button>
-            <button type="submit" form="edit-segment-form" class="btn btn-sm color-primary">
-                {% icon "checkmark-outline" %}
-                {% trans "Save" %}
-            </button>
-        </div>
-    </div>
+</div>
 
 </div>
