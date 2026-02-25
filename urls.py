@@ -7,6 +7,10 @@ urlpatterns = [
     # Dashboard
     path('', views.dashboard, name='dashboard'),
 
+    # Navigation tab aliases
+    path('list/', views.segments_list, name='list'),
+
+
     # Segment
     path('segments/', views.segments_list, name='segments_list'),
     path('segments/add/', views.segment_add, name='segment_add'),
