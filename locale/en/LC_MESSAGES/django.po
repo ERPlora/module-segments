@@ -1,0 +1,337 @@
+# English translations for Segments
+# Copyright (C) 2025
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-25 00:00+0000\n"
+"PO-Revision-Date: 2026-02-25 00:00+0000\n"
+"Last-Translator: ERPlora Team <info@erplora.com>\n"
+"Language: en\n"
+"Language-Team: English\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: module.py
+msgid "Segments"
+msgstr "Segments"
+
+msgid "Dynamic customer segmentation with rule-based filters"
+msgstr "Dynamic customer segmentation with rule-based filters"
+
+msgid "Settings"
+msgstr "Settings"
+
+#: models.py - COLOR_CHOICES
+msgid "Primary"
+msgstr "Primary"
+
+msgid "Success"
+msgstr "Success"
+
+msgid "Warning"
+msgstr "Warning"
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Neutral"
+msgstr "Neutral"
+
+#: models.py - LOGIC_CHOICES
+msgid "All rules must match (AND)"
+msgstr "All rules must match (AND)"
+
+msgid "Any rule must match (OR)"
+msgstr "Any rule must match (OR)"
+
+#: models.py - FIELD_CHOICES
+msgid "Lifecycle Stage"
+msgstr "Lifecycle Stage"
+
+msgid "Source"
+msgstr "Source"
+
+msgid "Total Spent"
+msgstr "Total Spent"
+
+msgid "Total Purchases"
+msgstr "Total Purchases"
+
+msgid "Last Purchase Date"
+msgstr "Last Purchase Date"
+
+msgid "City"
+msgstr "City"
+
+msgid "Country"
+msgstr "Country"
+
+msgid "Is Active"
+msgstr "Is Active"
+
+msgid "Created Date"
+msgstr "Created Date"
+
+msgid "Customer Group"
+msgstr "Customer Group"
+
+msgid "Birthday Month"
+msgstr "Birthday Month"
+
+#: models.py - OPERATOR_CHOICES
+msgid "Equals"
+msgstr "Equals"
+
+msgid "Does Not Equal"
+msgstr "Does Not Equal"
+
+msgid "Contains"
+msgstr "Contains"
+
+msgid "Does Not Contain"
+msgstr "Does Not Contain"
+
+msgid "Greater Than"
+msgstr "Greater Than"
+
+msgid "Less Than"
+msgstr "Less Than"
+
+msgid "Greater or Equal"
+msgstr "Greater or Equal"
+
+msgid "Less or Equal"
+msgstr "Less or Equal"
+
+msgid "Is Empty"
+msgstr "Is Empty"
+
+msgid "Is Not Empty"
+msgstr "Is Not Empty"
+
+msgid "In Last X Days"
+msgstr "In Last X Days"
+
+msgid "Not In Last X Days"
+msgstr "Not In Last X Days"
+
+#: models.py - VALUE_TYPE_CHOICES
+msgid "Text"
+msgstr "Text"
+
+msgid "Number"
+msgstr "Number"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "Boolean"
+msgstr "Boolean"
+
+#: models.py - Segment
+msgid "Name"
+msgstr "Name"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Color"
+msgstr "Color"
+
+msgid "Active"
+msgstr "Active"
+
+msgid "Dynamic"
+msgstr "Dynamic"
+
+msgid "Dynamic segments auto-update when rules change. Static segments are manually managed."
+msgstr "Dynamic segments auto-update when rules change. Static segments are manually managed."
+
+msgid "Customer Count"
+msgstr "Customer Count"
+
+msgid "Last Calculated"
+msgstr "Last Calculated"
+
+msgid "Logic Operator"
+msgstr "Logic Operator"
+
+msgid "Segment"
+msgstr "Segment"
+
+#: models.py - SegmentRule
+msgid "Field"
+msgstr "Field"
+
+msgid "Operator"
+msgstr "Operator"
+
+msgid "Value"
+msgstr "Value"
+
+msgid "Value Type"
+msgstr "Value Type"
+
+msgid "Sort Order"
+msgstr "Sort Order"
+
+msgid "Segment Rule"
+msgstr "Segment Rule"
+
+msgid "Segment Rules"
+msgstr "Segment Rules"
+
+#: models.py - SegmentSettings
+msgid "Auto-refresh Interval (minutes)"
+msgstr "Auto-refresh Interval (minutes)"
+
+msgid "Set to 0 to disable automatic refresh. Segments will only refresh on demand."
+msgstr "Set to 0 to disable automatic refresh. Segments will only refresh on demand."
+
+msgid "Max Segment Size"
+msgstr "Max Segment Size"
+
+msgid "Maximum number of customers per segment. 0 for unlimited."
+msgstr "Maximum number of customers per segment. 0 for unlimited."
+
+msgid "Segment Settings"
+msgstr "Segment Settings"
+
+#: templates - dashboard
+msgid "Total Segments"
+msgstr "Total Segments"
+
+msgid "Quick Actions"
+msgstr "Quick Actions"
+
+msgid "Manage Segments"
+msgstr "Manage Segments"
+
+msgid "View and manage all segments"
+msgstr "View and manage all segments"
+
+#: templates - list
+msgid "Search..."
+msgstr "Search..."
+
+msgid "Add"
+msgstr "Add"
+
+msgid "Export"
+msgstr "Export"
+
+msgid "Export as CSV"
+msgstr "Export as CSV"
+
+msgid "Export as Excel"
+msgstr "Export as Excel"
+
+msgid "selected"
+msgstr "selected"
+
+msgid "Activate"
+msgstr "Activate"
+
+msgid "Deactivate"
+msgstr "Deactivate"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "Confirm Delete"
+msgstr "Confirm Delete"
+
+msgid "Are you sure you want to delete"
+msgstr "Are you sure you want to delete"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Is Dynamic"
+msgstr "Is Dynamic"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "Show"
+msgstr "Show"
+
+msgid "per page"
+msgstr "per page"
+
+msgid "Showing %(start)s-%(end)s of %(total)s"
+msgstr "Showing %(start)s-%(end)s of %(total)s"
+
+msgid "No items yet"
+msgstr "No items yet"
+
+msgid "Add your first item to get started"
+msgstr "Add your first item to get started"
+
+msgid "Inactive"
+msgstr "Inactive"
+
+#: templates - add/edit
+msgid "Add Segment"
+msgstr "Add Segment"
+
+msgid "Edit Segment"
+msgstr "Edit Segment"
+
+msgid "Select..."
+msgstr "Select..."
+
+msgid "Last Calculated At"
+msgstr "Last Calculated At"
+
+msgid "Save"
+msgstr "Save"
+
+msgid "Danger Zone"
+msgstr "Danger Zone"
+
+msgid "Are you sure?"
+msgstr "Are you sure?"
+
+#: templates - settings
+msgid "Module configuration"
+msgstr "Module configuration"
+
+msgid "Auto Refresh Minutes"
+msgstr "Auto Refresh Minutes"
+
+msgid "Save Settings"
+msgstr "Save Settings"
+
+#: templates - rules
+msgid "Rules"
+msgstr "Rules"
+
+msgid "Add Rule"
+msgstr "Add Rule"
+
+#: templates - matching customers
+msgid "Matching Customers"
+msgstr "Matching Customers"
+
+msgid "No customers match the current rules"
+msgstr "No customers match the current rules"
+
+msgid "Add or modify rules to target customers"
+msgstr "Add or modify rules to target customers"

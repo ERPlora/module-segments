@@ -1,0 +1,337 @@
+# Spanish translations for Segments
+# Copyright (C) 2025
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-25 00:00+0000\n"
+"PO-Revision-Date: 2026-02-25 00:00+0000\n"
+"Last-Translator: ERPlora Team <info@erplora.com>\n"
+"Language: es\n"
+"Language-Team: Spanish\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: module.py
+msgid "Segments"
+msgstr "Segmentos"
+
+msgid "Dynamic customer segmentation with rule-based filters"
+msgstr "Segmentación dinámica de clientes con filtros basados en reglas"
+
+msgid "Settings"
+msgstr "Configuración"
+
+#: models.py - COLOR_CHOICES
+msgid "Primary"
+msgstr "Primario"
+
+msgid "Success"
+msgstr "Éxito"
+
+msgid "Warning"
+msgstr "Advertencia"
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Neutral"
+msgstr "Neutro"
+
+#: models.py - LOGIC_CHOICES
+msgid "All rules must match (AND)"
+msgstr "Todas las reglas deben coincidir (Y)"
+
+msgid "Any rule must match (OR)"
+msgstr "Cualquier regla debe coincidir (O)"
+
+#: models.py - FIELD_CHOICES
+msgid "Lifecycle Stage"
+msgstr "Etapa del ciclo de vida"
+
+msgid "Source"
+msgstr "Origen"
+
+msgid "Total Spent"
+msgstr "Total gastado"
+
+msgid "Total Purchases"
+msgstr "Total de compras"
+
+msgid "Last Purchase Date"
+msgstr "Fecha de última compra"
+
+msgid "City"
+msgstr "Ciudad"
+
+msgid "Country"
+msgstr "País"
+
+msgid "Is Active"
+msgstr "Está activo"
+
+msgid "Created Date"
+msgstr "Fecha de creación"
+
+msgid "Customer Group"
+msgstr "Grupo de cliente"
+
+msgid "Birthday Month"
+msgstr "Mes de cumpleaños"
+
+#: models.py - OPERATOR_CHOICES
+msgid "Equals"
+msgstr "Igual a"
+
+msgid "Does Not Equal"
+msgstr "No es igual a"
+
+msgid "Contains"
+msgstr "Contiene"
+
+msgid "Does Not Contain"
+msgstr "No contiene"
+
+msgid "Greater Than"
+msgstr "Mayor que"
+
+msgid "Less Than"
+msgstr "Menor que"
+
+msgid "Greater or Equal"
+msgstr "Mayor o igual"
+
+msgid "Less or Equal"
+msgstr "Menor o igual"
+
+msgid "Is Empty"
+msgstr "Está vacío"
+
+msgid "Is Not Empty"
+msgstr "No está vacío"
+
+msgid "In Last X Days"
+msgstr "En los últimos X días"
+
+msgid "Not In Last X Days"
+msgstr "No en los últimos X días"
+
+#: models.py - VALUE_TYPE_CHOICES
+msgid "Text"
+msgstr "Texto"
+
+msgid "Number"
+msgstr "Número"
+
+msgid "Date"
+msgstr "Fecha"
+
+msgid "Boolean"
+msgstr "Booleano"
+
+#: models.py - Segment
+msgid "Name"
+msgstr "Nombre"
+
+msgid "Description"
+msgstr "Descripción"
+
+msgid "Color"
+msgstr "Color"
+
+msgid "Active"
+msgstr "Activo"
+
+msgid "Dynamic"
+msgstr "Dinámico"
+
+msgid "Dynamic segments auto-update when rules change. Static segments are manually managed."
+msgstr "Los segmentos dinámicos se actualizan automáticamente cuando cambian las reglas. Los segmentos estáticos se gestionan manualmente."
+
+msgid "Customer Count"
+msgstr "Cantidad de clientes"
+
+msgid "Last Calculated"
+msgstr "Último cálculo"
+
+msgid "Logic Operator"
+msgstr "Operador lógico"
+
+msgid "Segment"
+msgstr "Segmento"
+
+#: models.py - SegmentRule
+msgid "Field"
+msgstr "Campo"
+
+msgid "Operator"
+msgstr "Operador"
+
+msgid "Value"
+msgstr "Valor"
+
+msgid "Value Type"
+msgstr "Tipo de valor"
+
+msgid "Sort Order"
+msgstr "Orden"
+
+msgid "Segment Rule"
+msgstr "Regla de segmento"
+
+msgid "Segment Rules"
+msgstr "Reglas de segmento"
+
+#: models.py - SegmentSettings
+msgid "Auto-refresh Interval (minutes)"
+msgstr "Intervalo de actualización automática (minutos)"
+
+msgid "Set to 0 to disable automatic refresh. Segments will only refresh on demand."
+msgstr "Establecer en 0 para deshabilitar la actualización automática. Los segmentos solo se actualizarán bajo demanda."
+
+msgid "Max Segment Size"
+msgstr "Tamaño máximo del segmento"
+
+msgid "Maximum number of customers per segment. 0 for unlimited."
+msgstr "Número máximo de clientes por segmento. 0 para ilimitado."
+
+msgid "Segment Settings"
+msgstr "Configuración de segmentos"
+
+#: templates - dashboard
+msgid "Total Segments"
+msgstr "Total de segmentos"
+
+msgid "Quick Actions"
+msgstr "Acciones rápidas"
+
+msgid "Manage Segments"
+msgstr "Gestionar segmentos"
+
+msgid "View and manage all segments"
+msgstr "Ver y gestionar todos los segmentos"
+
+#: templates - list
+msgid "Search..."
+msgstr "Buscar..."
+
+msgid "Add"
+msgstr "Añadir"
+
+msgid "Export"
+msgstr "Exportar"
+
+msgid "Export as CSV"
+msgstr "Exportar como CSV"
+
+msgid "Export as Excel"
+msgstr "Exportar como Excel"
+
+msgid "selected"
+msgstr "seleccionados"
+
+msgid "Activate"
+msgstr "Activar"
+
+msgid "Deactivate"
+msgstr "Desactivar"
+
+msgid "Delete"
+msgstr "Eliminar"
+
+msgid "Confirm Delete"
+msgstr "Confirmar eliminación"
+
+msgid "Are you sure you want to delete"
+msgstr "¿Estás seguro de que quieres eliminar"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Is Dynamic"
+msgstr "Es dinámico"
+
+msgid "Yes"
+msgstr "Sí"
+
+msgid "No"
+msgstr "No"
+
+msgid "Actions"
+msgstr "Acciones"
+
+msgid "Edit"
+msgstr "Editar"
+
+msgid "Show"
+msgstr "Mostrar"
+
+msgid "per page"
+msgstr "por página"
+
+msgid "Showing %(start)s-%(end)s of %(total)s"
+msgstr "Mostrando %(start)s-%(end)s de %(total)s"
+
+msgid "No items yet"
+msgstr "Sin elementos"
+
+msgid "Add your first item to get started"
+msgstr "Añade tu primer elemento para empezar"
+
+msgid "Inactive"
+msgstr "Inactivo"
+
+#: templates - add/edit
+msgid "Add Segment"
+msgstr "Añadir segmento"
+
+msgid "Edit Segment"
+msgstr "Editar segmento"
+
+msgid "Select..."
+msgstr "Seleccionar..."
+
+msgid "Last Calculated At"
+msgstr "Último cálculo el"
+
+msgid "Save"
+msgstr "Guardar"
+
+msgid "Danger Zone"
+msgstr "Zona de peligro"
+
+msgid "Are you sure?"
+msgstr "¿Estás seguro?"
+
+#: templates - settings
+msgid "Module configuration"
+msgstr "Configuración del módulo"
+
+msgid "Auto Refresh Minutes"
+msgstr "Minutos de actualización automática"
+
+msgid "Save Settings"
+msgstr "Guardar configuración"
+
+#: templates - rules
+msgid "Rules"
+msgstr "Reglas"
+
+msgid "Add Rule"
+msgstr "Añadir regla"
+
+#: templates - matching customers
+msgid "Matching Customers"
+msgstr "Clientes coincidentes"
+
+msgid "No customers match the current rules"
+msgstr "Ningún cliente coincide con las reglas actuales"
+
+msgid "Add or modify rules to target customers"
+msgstr "Añade o modifica reglas para segmentar clientes"
