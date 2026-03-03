@@ -29,3 +29,17 @@ PERMISSIONS = [
     'segments.export_segment',
     'segments.manage_settings',
 ]
+
+ROLE_PERMISSIONS = {
+    "admin": ["*"],
+    "manager": [
+        "add_segment",
+        "change_segment",
+        "export_segment",
+        "view_segment",
+    ],
+    "employee": [
+        "add_segment",
+        "view_segment",
+    ],
+}
