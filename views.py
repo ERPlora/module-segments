@@ -3,6 +3,8 @@ Segments Module Views
 """
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
+from django.http import HttpResponse
+from django.urls import reverse
 from django.shortcuts import get_object_or_404, render as django_render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -113,6 +115,7 @@ def segments_list(request):
     }
 
 @login_required
+@htmx_view('segments/pages/segment_add.html', 'segments/partials/segment_add_content.html')
 def segment_add(request):
     hub_id = request.session.get('hub_id')
     if request.method == 'POST':
@@ -134,10 +137,13 @@ def segment_add(request):
         obj.last_calculated_at = last_calculated_at
         obj.logic_operator = logic_operator
         obj.save()
-        return _render_segments_list(request, hub_id)
-    return django_render(request, 'segments/partials/panel_segment_add.html', {})
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = reverse('segments:segments_list')
+        return response
+    return {}
 
 @login_required
+@htmx_view('segments/pages/segment_edit.html', 'segments/partials/segment_edit_content.html')
 def segment_edit(request, pk):
     hub_id = request.session.get('hub_id')
     obj = get_object_or_404(Segment, pk=pk, hub_id=hub_id, is_deleted=False)
@@ -152,7 +158,7 @@ def segment_edit(request, pk):
         obj.logic_operator = request.POST.get('logic_operator', '').strip()
         obj.save()
         return _render_segments_list(request, hub_id)
-    return django_render(request, 'segments/partials/panel_segment_edit.html', {'obj': obj})
+    return {'obj': obj}
 
 @login_required
 @require_POST
